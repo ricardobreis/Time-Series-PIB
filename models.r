@@ -17,6 +17,7 @@ rm(list = ls())
 # carrega o arquivo com a série temporal do PIB ---------------------------
 
 pib <- read.csv2("~/Downloads/ipeadata[10-10-2019-07-53].csv")
+pib <- read.csv2("~/R-Projetos/PIBTimeSeries/pib.csv")
 names(pib) <- c("periodo", "valor")
 pib <- pib[301:356,]
 
@@ -86,6 +87,44 @@ lines(modelo_tendencia_linear_proj$fitted, lwd=2, col="blue")
 
 #Verifica a acurácia do modelo
 accuracy(modelo_tendencia_linear_proj, validacao_ts)
+
+
+# Modelo de Tendência Quadrática ------------------------------------------
+
+#Estima o modelo de Tendência Quadrática
+modelo_tendencia_poli <- tslm(treinamento_ts ~ trend + I(trend^2))
+
+#resumo do modelo
+summary(modelo_tendencia_poli)
+
+#Verificando resíduos
+
+#Plotando os resíduos
+plot(modelo_tendencia_poli$residuals, xlab="Tempo", ylab="Resíduos", ylim=c(-500, 500), bty="l")
+
+#calcula a autocorrelação dos resíduoss
+Acf(modelo_tendencia_poli$residuals)
+
+#verifica os resíduos com teste de Ljung-Box
+checkresiduals(modelo_tendencia_poli, test="LB")
+
+#plot modelo com tendência
+plot(treinamento_ts, xlab="Tempo", ylab="PIB", bty="l")
+lines(modelo_tendencia_poli$fitted.values, lwd=2)
+
+#projeta o modelo durante o período de validação
+modelo_tendencia_poli_proj <- forecast(modelo_tendencia_poli, h = tam_amostra_teste, level=0.95)
+
+#plota o gráfico da série temporal de treinamento e teste
+plot(modelo_tendencia_poli_proj, xlab="Tempo", ylab="PIB", xaxt="n", bty="l", flty=2,main="Forecast from Polynomial regression model")
+
+axis(1, at=seq(2015, 2020, 1), labels=format(seq(2015, 2020,1)))
+
+lines(validacao_ts)
+lines(modelo_tendencia_poli_proj$fitted, lwd=2, col="blue")
+
+#Verifica a acurácia do modelo
+accuracy(modelo_tendencia_poli_proj, validacao_ts)
 
 
 # Modelo de Tendência Linear Com Sazonalidade -----------------------------
@@ -164,8 +203,34 @@ lines(modelo_sazonal_tend_poli_proj$fitted, lwd=2, col="blue")
 accuracy(modelo_sazonal_tend_poli_proj, validacao_ts)
 
 
+# Modelo de tendência aditiva e sazonalidade multiplicativa ---------------
+
+#estima o modelo de suavização na base de treinamento
+modelo_ses <- ets(treinamento_ts, model = "AAM", restrict = FALSE)
+
+#resumo modelo
+summary(modelo_ses)
+
+#projeta os próximos 12 meses
+modelo_ses_proj <- forecast(modelo_ses, h=tam_amostra_teste, level=0.95)
+
+#plota o gráfico da projecão
+plot(modelo_ses_proj, ylab="PIB", xlab="Tempo", bty="l", xaxt="n", xlim=c(2015,2020), flty=2)
+
+axis(1, at=seq(2015,2020, 1), labels=format(seq(2015,2020, 1)))
+
+lines(modelo_ses$fitted, lwd=2, col="blue")
+
+lines(validacao_ts)
+
 #verifica precisao
 accuracy(modelo_ses_proj, validacao_ts)
+
+#calcula a autocorrelação dos resíduos
+Acf(modelo_ses$residuals)
+
+#verifica os resíduos com teste de Ljung-Box
+checkresiduals(modelo_ses, test="LB")
 
 
 # Modelo ZZZ --------------------------------------------------------------
