@@ -127,6 +127,83 @@ lines(modelo_tendencia_poli_proj$fitted, lwd=2, col="blue")
 accuracy(modelo_tendencia_poli_proj, validacao_ts)
 
 
+
+# Modelo de Tendência Exponencial -----------------------------------------
+
+# OBS
+# Melhorar Modelo
+modelo_tendencia_exp <- tslm(treinamento_ts ~ trend, lambda=0)
+
+#resumo do modelo
+summary(modelo_tendencia_exp)
+
+#Verificando resíduos
+
+#Plotando os resíduos
+plot(modelo_tendencia_exp$residuals, xlab="Tempo", ylab="Resíduos", ylim=c(-500, 500), bty="l")
+
+#calcula a autocorrelação dos resíduos
+Acf(modelo_tendencia_exp$residuals)
+
+#verifica os resíduos com teste de Ljung-Box
+checkresiduals(modelo_tendencia_exp, test="LB")
+
+#plot modelo com tendência
+plot(treinamento_ts, xlab="Tempo", ylab="PIB", bty="l")
+lines(modelo_tendencia_exp$fitted.values, lwd=2)
+
+#projeta o modelo durante o período de validação
+modelo_tendencia_exp_proj <- forecast(modelo_tendencia_exp, h = tam_amostra_teste, level=0)
+
+#plota o gráfico da série temporal de treinamento e teste
+plot(modelo_tendencia_exp_proj, xlab="Tempo", ylab="PIB", xaxt="n", ylim=c(1000, 1000000), xlim=c(2015, 2020), bty="l", flty=2 ,main="Forecast from Exp regression model")
+axis(1, at=seq(2015, 2020, 1), labels=format(seq(2015, 2020,1)))
+lines(validacao_ts)
+lines(modelo_tendencia_exp_proj$fitted, lwd=2, col="blue")
+
+#Verifica a acuracia do modelo
+accuracy(modelo_tendencia_exp_proj, validacao_ts)
+
+
+
+# Modelo Sazonal Linear ---------------------------------------------------
+
+#Estima o modelo de sazonal linear
+modelo_sazonalidade_linear <- tslm(treinamento_ts ~ season)
+
+#resumo do modelo
+summary(modelo_sazonalidade_linear)
+
+#Verificando resíduos
+
+#Plotando os resíduos
+plot(modelo_sazonalidade_linear$residuals, xlab="Tempo", ylab="Resíduos", ylim=c(-500, 500), bty="l")
+
+#calcula a autocorrelação dos resíduos
+Acf(modelo_sazonalidade_linear$residuals)
+
+#verifica os resíduos com teste de Ljung-Box
+checkresiduals(modelo_sazonalidade_linear, test="LB")
+
+#plot modelo com sazonalidade
+plot(treinamento_ts, xlab="Tempo", ylab="PIB", bty="l")
+lines(modelo_sazonalidade_linear$fitted.values, lwd=2, col="blue")
+
+#projeta o modelo durante o períoodo de validação
+modelo_sazonalidade_linear_proj <- forecast(modelo_sazonalidade_linear, h = tam_amostra_teste, level=0.95)
+
+#plota o grafico da serie temporal de treinamento e teste
+plot(modelo_sazonalidade_linear_proj, xlab="Tempo", ylab="PIB", xaxt="n", xlim=c(2015, 2020), bty="l", flty=2, main="Forecast from Seasonal regression model")
+
+axis(1, at=seq(2015, 2020, 1), labels=format(seq(2015, 2020,1)))
+
+lines(validacao_ts)
+lines(modelo_sazonalidade_linear_proj$fitted, lwd=2, col="blue")
+
+#Verifica a acurácia do modelo
+accuracy(modelo_sazonalidade_linear_proj, validacao_ts)
+
+
 # Modelo de Tendência Linear Com Sazonalidade -----------------------------
 
 #Estima o modelo de tendência linear com sazonalidade
