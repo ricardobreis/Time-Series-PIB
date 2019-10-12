@@ -11,6 +11,7 @@
 # Carrega pacotes ---------------------------------------------------------
 
 library(forecast)
+library(zoo)
 rm(list = ls())
 
 
@@ -27,8 +28,9 @@ pib <- pib[301:356,]
 pib_ts <- ts(pib$valor, start=c(2015,1), end=c(2019,8), frequency = 12)
 
 #Plota o gráfico da série temporal
+par(bg="#F4F5F7")
 plot(pib_ts, xlab="Tempo", ylab="PIB", bty="l")
-
+autoplot(pib_ts, geom = "line")
 
 # Separa as amostras em treinamento e teste -------------------------------
 
@@ -286,14 +288,14 @@ accuracy(modelo_sazonal_tend_poli_proj, validacao_ts)
 #estima o modelo de MA na base de treinamento
 ma_simples <- rollmean(treinamento_ts, k=12, align="right")
 
-#obtem a média da última janela movel de 12 meses para projeção
+#obtem a média da última janela móvel de 12 meses para projeção
 ultima_ma <- tail(ma_simples, 1)
 
 #cria uma projeção que Ã© a repetição da última média da janela para o período de validação
 ma_simples_proj <- ts(rep(ultima_ma, tam_amostra_teste), start=c(2015, tam_amostra_treinamento+1), end = c(2015, tam_amostra_treinamento + tam_amostra_teste), freq=12)
 
 #plota o gráfico da projeção
-plot(treinamento_ts, ylab="Passageiros", xlab="PIB", bty="l", xaxt="n", xlim=c(2015,2020))
+plot(treinamento_ts, ylab="PIB", xlab="Tempo", bty="l", xaxt="n", xlim=c(2015,2020))
 
 axis(1, at=seq(2015,2020, 1), labels=format(seq(2015,2020, 1)))
 
@@ -318,6 +320,127 @@ Acf(treinamento_ts-ma_simples)
 #verifica os resíduos com teste de Ljung-Box
 checkresiduals(treinamento_ts-ma_simples, test="LB")
 
+
+# Modelo de Tendência Aditiva ---------------------------------------------
+
+#estima o modelo de suavização na base de treinamento
+modelo_ses <- ets(treinamento_ts, model = "AAN")
+
+#resumo modelo
+summary(modelo_ses)
+
+#projeta os próximos 8 meses
+modelo_ses_proj <- forecast(modelo_ses, h=tam_amostra_teste, level=0.95)
+
+#plota o gráfico da projecão
+plot(modelo_ses_proj, ylab="PIB", xlab="Tempo", bty="l", xaxt="n", xlim=c(2015,2020), flty=2)
+
+axis(1, at=seq(2015,2020, 1), labels=format(seq(2015,2020, 1)))
+
+lines(modelo_ses$fitted, lwd=2, col="blue")
+
+lines(validacao_ts)
+
+#verifica precisão
+accuracy(modelo_ses_proj, validacao_ts)
+
+#calcula a autocorrelação dos resíduos
+Acf(modelo_ses$residuals)
+
+#verifica os resíduos com teste de Ljung-Box
+checkresiduals(modelo_ses, test="LB")
+
+
+# Modelo de Tendência Multiplicativa --------------------------------------
+
+#estima o modelo de suavização na base de treinamento
+modelo_ses <- ets(treinamento_ts, model = "MMN")
+
+#resumo modelo
+summary(modelo_ses)
+
+#projeta os próximos 8 meses
+modelo_ses_proj <- forecast(modelo_ses, h=tam_amostra_teste, level=0.95)
+
+#plota o gráfico da projeção
+plot(modelo_ses_proj, ylab="PIB", xlab="Tempo", bty="l", xaxt="n", xlim=c(2015,2020), flty=2)
+
+axis(1, at=seq(2015,2020, 1), labels=format(seq(2015,2020, 1)))
+
+lines(modelo_ses$fitted, lwd=2, col="blue")
+
+lines(validacao_ts)
+
+#verifica precisão
+accuracy(modelo_ses_proj, validacao_ts)
+
+#calcula a autocorrelação dos resíduos
+Acf(modelo_ses$residuals)
+
+#verifica os resíduos com teste de Ljung-Box
+checkresiduals(modelo_ses, test="LB")
+
+
+# Modelo de Tendência e Sazonalidade Aditiva ------------------------------
+
+#estima o modelo de suavização na base de treinamento
+modelo_ses <- ets(treinamento_ts, model = "AAA")
+
+#resumo modelo
+summary(modelo_ses)
+
+#projeta os próximos 8 meses
+modelo_ses_proj <- forecast(modelo_ses, h=tam_amostra_teste, level=0.95)
+
+#plota o gráfico da projeção
+plot(modelo_ses_proj, ylab="PIB", xlab="Tempo", bty="l", xaxt="n", xlim=c(2015,2020), flty=2)
+
+axis(1, at=seq(2015,2020, 1), labels=format(seq(2015,2020, 1)))
+
+lines(modelo_ses$fitted, lwd=2, col="blue")
+
+lines(validacao_ts)
+
+#verifica precisão
+accuracy(modelo_ses_proj, validacao_ts)
+
+#calcula a autocorrelação dos resíduos
+Acf(modelo_ses$residuals)
+
+#verifica os resíduos com teste de Ljung-Box
+checkresiduals(modelo_ses, test="LB")
+
+
+# Modelo de Tendência Aditiva, Sazonalidade Multiplicativa e Erro  --------
+
+#estima o modelo de suavização na base de treinamento
+modelo_ses <- ets(treinamento_ts, model = "MAM")
+
+#resumo modelo
+summary(modelo_ses)
+
+#projeta os próximos 8 meses
+modelo_ses_proj <- forecast(modelo_ses, h=tam_amostra_teste, level=0.95)
+
+#plota o gráfico da projeção
+plot(modelo_ses_proj, ylab="PIB", xlab="Tempo", bty="l", xaxt="n", xlim=c(2015,2020), flty=2)
+
+axis(1, at=seq(2015,2020, 1), labels=format(seq(2015,2020, 1)))
+
+lines(modelo_ses$fitted, lwd=2, col="blue")
+
+lines(validacao_ts)
+
+#verifica precisão
+accuracy(modelo_ses_proj, validacao_ts)
+
+#calcula a autocorrelação dos resíduos
+Acf(modelo_ses$residuals)
+
+#verifica os resíduos com teste de Ljung-Box
+checkresiduals(modelo_ses, test="LB")
+
+
 # Modelo de Tendência Aditiva e Sazonalidade Multiplicativa ---------------
 
 #estima o modelo de suavização na base de treinamento
@@ -326,7 +449,7 @@ modelo_ses <- ets(treinamento_ts, model = "AAM", restrict = FALSE)
 #resumo modelo
 summary(modelo_ses)
 
-#projeta os próximos 12 meses
+#projeta os próximos 8 meses
 modelo_ses_proj <- forecast(modelo_ses, h=tam_amostra_teste, level=0.95)
 
 #plota o gráfico da projecão
@@ -348,6 +471,23 @@ Acf(modelo_ses$residuals)
 checkresiduals(modelo_ses, test="LB")
 
 
+#Preparar projeção
+
+#primeiramente reestimamos o modelo com todos os dados de treinamento e validacao
+modelo_ses_final <- ets(pib_ts, model = "MAM")
+
+#sumário do modelo
+summary(modelo_ses_final)
+
+#projeta os próximos 4 meses do futuro
+modelo_ses_final_proj <- forecast(modelo_ses_final, h=4, level=0.95)
+
+par(bg="#F4F5F7")
+plot(modelo_ses_final_proj, xlab="Tempo", ylab="PIB", xlim=c(2015, 2020), bty="l", flty=2, main="Modelo de Tendência Aditiva e Sazonalidade Multiplicativa")
+axis(1, at=seq(2015, 2020, 1), labels=format(seq(2015, 2020,1)))
+lines(modelo_ses_final_proj$fitted, lwd=2, col="blue")
+
+
 # Modelo ZZZ --------------------------------------------------------------
 
 #estima o modelo de suavizacao na base de treinamento
@@ -356,10 +496,10 @@ modelo_ses <- ets(treinamento_ts, model = "ZZZ", restrict = FALSE, allow.multipl
 #resumo modelo
 summary(modelo_ses)
 
-#projeta os proximos 12 meses
+#projeta os próximos 8 meses
 modelo_ses_proj <- forecast(modelo_ses, h=tam_amostra_teste, level=0.95)
 
-#plota o grafica da projecao
+#plota o gráfico da projeção
 plot(modelo_ses_proj, ylab="PIB", xlab="Tempo", bty="l", xaxt="n", xlim=c(2015,2020), flty=2)
 
 axis(1, at=seq(2015,2020, 1), labels=format(seq(2015,2020, 1)))
@@ -368,5 +508,5 @@ lines(modelo_ses$fitted, lwd=2, col="blue")
 
 lines(validacao_ts)
 
-#verifica precisao
+#verifica precisão
 accuracy(modelo_ses_proj, validacao_ts)
