@@ -233,7 +233,8 @@ lines(modelo_sazonalidade_tendencia_linear$fitted.values, lwd=2, col="blue")
 modelo_sazonalidade_tendencia_linear_proj <- forecast(modelo_sazonalidade_tendencia_linear, h = tam_amostra_teste, level=0.95)
 
 #plota o gráfico da série temporal de treinamento e teste
-plot(modelo_sazonalidade_tendencia_linear_proj, xlab="Tempo", ylab="Vendas", xaxt="n", xlim=c(2015, 2020), bty="l", flty=2, main="Forecast from Seasonal and Trend regression model")
+par(bg="#F4F5F7")
+plot(modelo_sazonalidade_tendencia_linear_proj, xlab="Tempo", ylab="Vendas", xaxt="n", xlim=c(2015, 2020), bty="l", flty=2, main="Modelo de Tendência Linear Com Sazonalidade")
 
 axis(1, at=seq(2015, 2020, 1), labels=format(seq(2015, 2020,1)))
 
@@ -242,6 +243,23 @@ lines(modelo_sazonalidade_tendencia_linear_proj$fitted, lwd=2, col="blue")
 
 #Verifica a acurácia do modelo
 accuracy(modelo_sazonalidade_tendencia_linear_proj, validacao_ts)
+
+
+#Preparar projeção
+
+#primeiramente reestimamos o modelo com todos os dados de treinamento e validacao
+modelo_sazonalidade_tendencia_linear_final <- tslm(pib_ts ~ season + trend)
+
+#sumário do modelo
+summary(modelo_sazonalidade_tendencia_linear_final)
+
+#projeta os próximos 4 meses do futuro
+modelo_sazonalidade_tendencia_linear_final_proj <- forecast(modelo_sazonalidade_tendencia_linear_final, h=4, level=0.95)
+
+par(bg="#F4F5F7")
+plot(modelo_sazonalidade_tendencia_linear_final_proj, xlab="Tempo", ylab="PIB", xlim=c(2015, 2020), bty="l", flty=2, main="Modelo de Tendência Linear Com Sazonalidade")
+axis(1, at=seq(2015, 2020, 1), labels=format(seq(2015, 2020,1)))
+lines(modelo_ses_final_proj$fitted, lwd=2, col="blue")
 
 
 # Modelo de Tendência Quadrática Com Sazonalidade -------------------------
