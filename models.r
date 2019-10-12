@@ -280,7 +280,45 @@ lines(modelo_sazonal_tend_poli_proj$fitted, lwd=2, col="blue")
 accuracy(modelo_sazonal_tend_poli_proj, validacao_ts)
 
 
-# Modelo de tendência aditiva e sazonalidade multiplicativa ---------------
+
+# Modelo de MA ------------------------------------------------------------
+
+#estima o modelo de MA na base de treinamento
+ma_simples <- rollmean(treinamento_ts, k=12, align="right")
+
+#obtem a média da última janela movel de 12 meses para projeção
+ultima_ma <- tail(ma_simples, 1)
+
+#cria uma projeção que Ã© a repetição da última média da janela para o período de validação
+ma_simples_proj <- ts(rep(ultima_ma, tam_amostra_teste), start=c(2015, tam_amostra_treinamento+1), end = c(2015, tam_amostra_treinamento + tam_amostra_teste), freq=12)
+
+#plota o gráfico da projeção
+plot(treinamento_ts, ylab="Passageiros", xlab="PIB", bty="l", xaxt="n", xlim=c(2015,2020))
+
+axis(1, at=seq(2015,2020, 1), labels=format(seq(2015,2020, 1)))
+
+lines(ma_simples, lwd=2, col="blue")
+
+lines(ma_simples_proj, lwd=2, lty=2, col="blue")
+
+lines(validacao_ts)
+
+#valida a precisão da estimação no período de treinamento
+accuracy(ma_simples, treinamento_ts)
+
+#valida a precisão da estimação no período de validação
+accuracy(ma_simples_proj, validacao_ts)
+
+#Plotando os resíduos
+plot(treinamento_ts-ma_simples, xlab="Tempo", ylab="Resíduos", ylim=c(-500, 500), bty="l")
+
+#calcula a autocorrelação dos resíduos
+Acf(treinamento_ts-ma_simples)
+
+#verifica os resíduos com teste de Ljung-Box
+checkresiduals(treinamento_ts-ma_simples, test="LB")
+
+# Modelo de Tendência Aditiva e Sazonalidade Multiplicativa ---------------
 
 #estima o modelo de suavização na base de treinamento
 modelo_ses <- ets(treinamento_ts, model = "AAM", restrict = FALSE)
