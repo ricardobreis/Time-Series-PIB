@@ -1,5 +1,8 @@
 # Time-Series-PIB
 
+## Accuracy
+![Accuracy of Models](https://github.com/ricardobreis/Time-Series-PIB/blob/master/Accuracy.PNG)
+
 ## Best Model
 ### Linear Trend With Seasonality
 ![PIB - Time Series](https://github.com/ricardobreis/Time-Series-PIB/blob/master/forecast%20-%20tendencia%20linear%20com%20sazonalidade.png)
