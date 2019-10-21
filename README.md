@@ -1,5 +1,8 @@
 # Time-Series-PIB
 
+## A Brief Explanation
+The purpose of this project is to find a model with a good fit with the Brazilian PIB (GDP) time serie, aiming to forecast next months. The project was presented at Fundação Getulio Vargas (FGV) Time Series Analisys class.
+
 ## Accuracy
 ![Accuracy of Models](https://github.com/ricardobreis/Time-Series-PIB/blob/master/Accuracy.PNG)
 
