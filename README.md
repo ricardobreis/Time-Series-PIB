@@ -17,4 +17,4 @@ http://www.ipeadata.gov.br/Default.aspx
 - Source: Banco Central do Brasil, Boletim, Seção Atividade Econômica (Bacen / Boletim / Ativ. Ec.)
 - Currency: R$ (Millions)
 - Comments: Quadro: Contas nacionais. Obs.: Produto Interno Bruto (PIB). Estimativa do Banco Central.
-- Updated in: 23/09/2019
+- Updated on: 23/09/2019
