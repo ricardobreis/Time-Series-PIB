@@ -8,7 +8,7 @@ The purpose of this project is to find a model with a good fit with the Brazilia
 
 ## Best Model
 ### Linear Trend With Seasonality
-![PIB - Time Series](https://github.com/ricardobreis/Time-Series-PIB/blob/master/forecast%20-%20tendencia%20linear%20com%20sazonalidade.png)
+![PIB - Time Series](https://github.com/ricardobreis/Time-Series-PIB/blob/master/Best%20Model-%20tendencia%20linear%20com%20sazonalidade.png)
 
 ## PIB Time Series Dataset
 http://www.ipeadata.gov.br/Default.aspx
